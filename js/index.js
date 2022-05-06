@@ -27,6 +27,7 @@
             itinerary,
             elevation,
             exportRoute,
+            journey,
             profile,
             trackMessages,
             trackAnalysis,
@@ -313,6 +314,7 @@
         sidebar = BR.sidebar({
             defaultTabId: BR.conf.transit ? 'tab_itinerary' : 'tab_profile',
             listeningTabs: {
+                tab_journey: journey,
                 tab_profile: profile,
                 tab_data: trackMessages,
                 tab_analysis: trackAnalysis,

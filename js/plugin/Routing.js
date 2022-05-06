@@ -1,6 +1,6 @@
 L.Routing.Draw.prototype._hideTrailer = function () {
     if (this._trailer.options.opacity !== 0.0) {
-        this._trailer.setStyle({ opacity: 0.0 });
+        this._trailer.setStyle({opacity: 0.0});
     }
 };
 
@@ -8,9 +8,9 @@ BR.Routing = L.Routing.extend({
     options: {
         position: 'topright',
         icons: {
-            start: L.VectorMarkers.icon({ icon: 'play', markerColor: BR.conf.markerColors.start }),
-            normal: L.VectorMarkers.icon({ icon: 'circle', markerColor: BR.conf.markerColors.via }),
-            end: L.VectorMarkers.icon({ icon: 'stop', markerColor: BR.conf.markerColors.stop }),
+            start: L.VectorMarkers.icon({icon: 'play', markerColor: BR.conf.markerColors.start}),
+            normal: L.VectorMarkers.icon({icon: 'circle', markerColor: BR.conf.markerColors.via}),
+            end: L.VectorMarkers.icon({icon: 'stop', markerColor: BR.conf.markerColors.stop}),
             draw: false,
             opacity: 1,
         },
@@ -53,6 +53,7 @@ BR.Routing = L.Routing.extend({
         });
 
         this.on('routing:routeWaypointEnd routing:setWaypointsEnd routing:rerouteAllSegmentsEnd', function (evt) {
+            this.updateJourney();
             this._updateDistanceMarkers(evt);
         });
 
@@ -141,11 +142,13 @@ BR.Routing = L.Routing.extend({
                 this._show();
             }
         }
+
         function hide() {
             if (!this._hidden && this._parent._waypoints._first) {
                 this._hide();
             }
         }
+
         this._draw.on('enabled', function () {
             this._map.on('mouseout', hide, this);
             this._map.on('mouseover', show, this);
@@ -272,7 +275,7 @@ BR.Routing = L.Routing.extend({
             callbackCount++;
             firstErr = firstErr || err;
             if (callbackCount >= latLngs.length) {
-                $this.fire('routing:setWaypointsEnd', { err: firstErr });
+                $this.fire('routing:setWaypointsEnd', {err: firstErr});
                 if (cb) {
                     cb(firstErr);
                 }
@@ -321,7 +324,7 @@ BR.Routing = L.Routing.extend({
 
         // change segment color before request to indicate recalculation (mark old)
         if (m1 && m1._routing.nextLine !== null) {
-            m1._routing.nextLine.setStyle({ color: 'dimgray' });
+            m1._routing.nextLine.setStyle({color: 'dimgray'});
         }
 
         // animate dashed trailer as loading indicator
@@ -398,7 +401,8 @@ BR.Routing = L.Routing.extend({
 
     deleteLastPoint: function () {
         if ((lastPoint = this.getLast())) {
-            this.removeWaypoint(lastPoint, function (err, data) {});
+            this.removeWaypoint(lastPoint, function (err, data) {
+            });
         }
     },
 
@@ -416,5 +420,32 @@ BR.Routing = L.Routing.extend({
             this._distanceMarkers = new L.DistanceMarkers(this.toPolyline(), this._map, distanceMarkersOpts);
             this._map.addLayer(this._distanceMarkers);
         }
+    },
+
+    updateJourney: function () {
+        let waypoints = [];
+        let currentWaypoint = this._waypoints._first;
+
+        while (currentWaypoint) {
+            waypoints.push(currentWaypoint);
+            currentWaypoint = currentWaypoint._routing.nextMarker;
+        }
+
+        let segments = this.getSegments();
+        segments.forEach(segment => {
+            if (!segment.bla) {
+                segment.bla = Math.floor(Math.random() * 101)
+                segment.options.color='#'+(Math.random()*100000).toFixed(6)
+            }
+        })
+        waypoints.forEach(waypoint => {
+            if (!waypoint.bla) {
+                waypoint.bla = Math.floor(Math.random() * 101)
+            }
+        })
+
+        let table = '<table>' + waypoints.map(waypoint => `<tr><td>${waypoint.bla}</td><td>${waypoint._latlng.lat}</td><td>${waypoint._latlng.lng}</td></tr>`).join('') + '</table>';
+        document.getElementById('journeyTable').innerHTML = table;
+        console.log("updateJourney", {blaS: segments.map(segment => segment.bla), blaW: waypoints.map(waypoint => waypoint.bla), waypoints: waypoints.map(waypoint => waypoint._latlng), segments})
     },
 });

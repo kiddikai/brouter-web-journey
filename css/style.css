@@ -557,6 +557,7 @@ table.dataTable.display tbody tr:hover.selected {
  * leaflet-sidebar-v2
  */
 
+.leaflet-sidebar-pane#tab_journey,
 .leaflet-sidebar-pane#tab_profile,
 .leaflet-sidebar-pane#tab_data,
 .leaflet-sidebar-pane#tab_itinerary {
